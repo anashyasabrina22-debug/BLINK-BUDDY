@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#fff3f8">
+<title>Blink Buddy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root{
+ --pink:#ed85b4;
+ --pink2:#f7b4d0;
+ --deep:#b95183;
+ --bg:#fff5f9;
+ --ink:#624253;
+ --muted:#ae91a0;
+ --white:#fff;
+ --line:#f7e3ed;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--ink);
+ font-family:'DM Sans',sans-serif;
+ min-height:100vh;overflow-x:hidden;
+}
+body:before{
+ content:"";position:fixed;inset:0;z-index:-1;
+ background:
+ radial-gradient(circle at 5% 5%,#ffe1ef 0,transparent 35%),
+ radial-gradient(circle at 100% 35%,#f4e5ff 0,transparent 35%),
+ linear-gradient(145deg,#fff7fa,#fff0f6);
+}
+button,input{font:inherit}
+button{cursor:pointer;border:0}
+.app{max-width:520px;margin:auto;padding:0 21px 110px}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:25px 0 19px;
+}
+.brand{display:flex;align-items:center;gap:11px}
+.brand-icon{
+ width:43px;height:43px;border-radius:15px;
+ background:linear-gradient(145deg,#f5a8ca,#d875a7);
+ display:grid;place-items:center;color:white;font-size:23px;
+ box-shadow:0 7px 17px #d879a744;
+}
+.brand-name{font-family:Outfit;font-size:18px;font-weight:800;letter-spacing:1px}
+.brand-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.avatar{
+ width:42px;height:42px;border-radius:50%;
+ background:#ffe0ed;display:grid;place-items:center;font-size:20px;
+ border:3px solid white;
+}
+.page{display:none;animation:enter .35s ease}
+.page.active{display:block}
+@keyframes enter{
+ from{opacity:0;transform:translateY(10px)}
+ to{opacity:1;transform:translateY(0)}
+}
+.eyebrow{
+ color:var(--deep);font-size:11px;font-weight:800;
+ letter-spacing:2px;text-transform:uppercase;
+}
+h1,h2,h3,p{margin-top:0}
+.greeting h1{
+ font:700 29px Outfit;margin:8px 0 4px;letter-spacing:-.8px;
+}
+.greeting p{font-size:13px;color:var(--muted);margin-bottom:20px}
+.clock-card{
+ position:relative;overflow:hidden;
+ padding:24px;border-radius:27px;
+ color:white;
+ background:linear-gradient(135deg,#ee9fc3,#d878a8);
+ box-shadow:0 14px 30px #d57da83a;
+}
+.clock-card:after{
+ content:"✦";position:absolute;right:20px;top:12px;
+ font-size:85px;color:#ffffff26;
+}
+.clock-label{font-size:11px;letter-spacing:2px;color:#fff0f7}
+.clock{
+ font:600 56px Outfit;letter-spacing:-2px;
+ margin:7px 0 1px;font-variant-numeric:tabular-nums;
+}
+.clock-date{font-size:12px;color:#fff0f7}
+.clock-bottom{
+ display:flex;align-items:center;justify-content:space-between;
+ margin-top:23px;padding-top:17px;border-top:1px solid #ffffff45;
+ font-size:12px;
+}
+.clock-bottom strong{font-size:13px}
+.section-head{
+ display:flex;justify-content:space-between;align-items:center;
+ margin:25px 0 13px;
+}
+.section-head h2{font:700 18px Outfit;margin:0}
+.text-button{background:none;color:var(--deep);font-size:12px;font-weight:700}
+.next-card,.alarm-card,.panel{
+ background:#ffffffdc;border:1px solid white;
+ border-radius:21px;padding:17px;
+ box-shadow:0 5px 22px #bd759014;
+}
+.next-card{display:flex;align-items:center;gap:14px}
+.next-icon{
+ width:49px;height:49px;border-radius:16px;
+ background:#ffe7f1;display:grid;place-items:center;font-size:23px;
+}
+.next-time{font:700 25px Outfit}
+.next-info{font-size:11px;color:var(--muted);margin-top:3px}
+.pill{
+ margin-left:auto;padding:7px 10px;border-radius:30px;
+ background:#fce7f0;color:#bf638e;font-size:10px;font-weight:700;
+}
+.stats{
+ display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;
+}
+.stat{
+ background:#fff;border:1px solid white;border-radius:19px;
+ padding:16px;
+}
+.stat-icon{font-size:19px}
+.stat-number{font:700 24px Outfit;margin:8px 0 2px}
+.stat-label{font-size:11px;color:var(--muted)}
+.alarm-list{display:grid;gap:12px}
+.alarm-card{display:flex;align-items:center;gap:12px}
+.alarm-time{font:700 27px Outfit;color:#bd608c}
+.alarm-name{font-size:12px;font-weight:700;margin-top:2px}
+.alarm-meta{font-size:10px;color:var(--muted);margin-top:4px}
+.toggle{
+ width:42px;height:24px;border-radius:20px;background:#eadde4;
+ margin-left:auto;position:relative;flex-shrink:0;
+}
+.toggle:after{
+ content:"";position:absolute;width:18px;height:18px;
+ background:white;border-radius:50%;top:3px;left:3px;
+ transition:.2s;box-shadow:0 1px 5px #0002;
+}
+.toggle.on{background:#e98bb7}
+.toggle.on:after{left:21px}
+.add-card{
+ width:100%;padding:17px;border-radius:18px;
+ background:#fff;border:1.5px dashed #e9a9c7;
+ color:var(--deep);font-weight:700;margin-top:13px;
+}
+.form-title{font:700 26px Outfit;margin:9px 0 6px}
+.form-sub{font-size:12px;color:var(--muted);margin-bottom:23px}
+.field{margin-bottom:17px}
+.field label{
+ display:block;font-size:12px;font-weight:700;margin-bottom:8px;
+}
+.field input[type=time],.field input[type=text]{
+ width:100%;padding:14px;border:1px solid var(--line);
+ background:#fffafd;border-radius:14px;color:var(--ink);
+ outline:none;
+}
+.upload{
+ background:#fffafd;border:1px dashed #e5abc6;
+ padding:16px;border-radius:16px;
+}
+.upload input{width:100%;font-size:11px}
+.preview{
+ width:100%;max-height:150px;object-fit:contain;
+ border-radius:12px;margin-top:10px;
+}
+.primary{
+ background:linear-gradient(110deg,#ed93bb,#d975a8);
+ color:white;border-radius:15px;padding:15px;
+ width:100%;font-weight:800;
+ box-shadow:0 7px 15px #d77ca53a;
+}
+.secondary{
+ background:#fce8f1;color:#b75b87;
+ border-radius:13px;padding:11px 15px;font-weight:700;
+}
+.bottom-nav{
+ position:fixed;bottom:0;left:0;right:0;
+ background:#ffffffed;backdrop-filter:blur(20px);
+ border-top:1px solid #f5e2eb;
+ display:flex;justify-content:center;gap:0;
+ padding:10px max(12px,calc((100vw - 480px)/2)) calc(10px + env(safe-area-inset-bottom));
+ z-index:5;
+}
+.nav-item{
+ flex:1;max-width:120px;background:none;color:#b69aa8;
+ display:flex;flex-direction:column;align-items:center;
+ gap:4px;font-size:10px;font-weight:600;padding:5px;
+}
+.nav-item span{font-size:21px}
+.nav-item.active{color:#ce6798}
+.empty{text-align:center;padding:35px 10px;color:var(--muted);font-size:12px}
+.empty div{font-size:35px;margin-bottom:10px}
+.setting-row{
+ display:flex;align-items:center;justify-content:space-between;
+ padding:17px 0;border-bottom:1px solid var(--line);font-size:13px;
+}
+#ring{
+ position:fixed;inset:0;background:linear-gradient(145deg,#ed9fc3,#d87da9);
+ color:white;z-index:20;display:none;
+ align-items:center;justify-content:center;text-align:center;padding:25px;
+}
+#ring.show{display:flex}
+.ring-time{font:700 76px Outfit}
+.ring-img{width:175px;height:175px;border-radius:27px;object-fit:cover;margin:20px auto}
+.ring-actions{display:flex;gap:12px;margin-top:25px}
+.ring-actions button{flex:1;padding:16px;border-radius:15px;font-weight:800}
+@media(min-width:600px){
+ .app{padding-top:10px}
+ .clock{font-size:65px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+ <div class="brand">
+  <div class="brand-icon">♡</div>
+  <div>
+   <div class="brand-name">BLINK BUDDY</div>
+   <div class="brand-sub">YOUR TIME COMPANION</div>
+  </div>
+ </div>
+ <div class="avatar">🌷</div>
+</header>
+
+<!-- HOME -->
+<section id="home" class="page active">
+ <div class="greeting">
+  <div class="eyebrow">A LITTLE REMINDER</div>
+  <h1>Make today lovely.</h1>
+  <p>Every moment deserves a beautiful beginning.</p>
+ </div>
+
+ <div class="clock-card">
+  <div class="clock-label">YOUR LOCAL TIME</div>
+  <div class="clock" id="clock">00:00:00</div>
+  <div class="clock-date" id="date">Loading date...</div>
+  <div class="clock-bottom">
+   <span>♡ Stay on time, stay happy</span>
+   <strong>BLINK ✦</strong>
+  </div>
+ </div>
+
+ <div class="section-head">
+  <h2>Coming up</h2>
+  <button class="text-button" onclick="showPage('alarms')">View all →</button>
+ </div>
+ <div id="nextAlarm"></div>
+
+ <div class="stats">
+  <div class="stat">
+   <div class="stat-icon">⏰</div>
+   <div class="stat-number" id="total">0</div>
+   <div class="stat-label">Total alarms</div>
+  </div>
+  <div class="stat">
+   <div class="stat-icon">💗</div>
+   <div class="stat-number" id="active">0</div>
+   <div class="stat-label">Active alarms</div>
+  </div>
+ </div>
+</section>
+
+<!-- ALARMS -->
+<section id="alarms" class="page">
+ <div class="eyebrow">YOUR DAILY ROUTINE</div>
+ <div class="form-title">My Alarms ♡</div>
+ <p class="form-sub">A little reminder for every important moment.</p>
+ <div id="alarmList" class="alarm-list"></div>
+ <button class="add-card" onclick="showPage('create')">＋ Create new alarm</button>
+</section>
+
+<!-- CREATE -->
+<section id="create" class="page">
+ <div class="eyebrow">PERSONALIZE YOUR MOMENT</div>
+ <div class="form-title">New Alarm ♡</div>
+ <p class="form-sub">Make your wake-up moment special.</p>
+
+ <div class="panel">
+  <div class="field">
+   <label>Alarm time</label>
+   <input type="time" id="time" value="07:00">
+  </div>
+  <div class="field">
+   <label>Alarm name</label>
+   <input type="text" id="name" placeholder="Good morning!">
+  </div>
+  <div class="field">
+   <label>Choose your music ♫</label>
+   <div class="upload">
+    <input type="file" id="music" accept="audio/*">
+    <div id="musicName" class="alarm-meta">No music selected</div>
+    <button class="secondary" style="margin-top:12px" onclick="previewMusic()">▶ Preview music</button>
+   </div>
+  </div>
+  <div class="field">
+   <label>Choose your picture</label>
+   <div class="upload">
+    <input type="file" id="picture" accept="image/*">
+    <img id="imagePreview" class="preview" hidden>
+   </div>
+  </div>
+  <button class="primary" onclick="saveAlarm()">SAVE MY ALARM ♡</button>
+ </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="page">
+ <div class="eyebrow">PERSONAL SPACE</div>
+ <div class="form-title">Settings</div>
+ <p class="form-sub">Make Blink Buddy yours.</p>
+ <div class="panel">
+  <div class="setting-row">
+   <span>🔔 Notification permission</span>
+   <button class="secondary" onclick="askPermission()">Enable</button>
+  </div>
+  <div class="setting-row">
+   <span>💗 Application</span><b>1.0</b>
+  </div>
+  <div class="setting-row">
+   <span>🎀 Theme</span><b>Pink Dream</b>
+  </div>
+  <div class="setting-row" style="border:0">
+   <span>♡ About</span><b>BLINK BUDDY</b>
+  </div>
+ </div>
+ <p class="alarm-meta" style="text-align:center;margin-top:25px">
+  Made with love ♡<br>THE SCREENAGERS
+ </p>
+</section>
+
+</div>
+
+<nav class="bottom-nav">
+ <button class="nav-item active" data-page="home" onclick="showPage('home')"><span>⌂</span>Home</button>
+ <button class="nav-item" data-page="alarms" onclick="showPage('alarms')"><span>◷</span>Alarms</button>
+ <button class="nav-item" data-page="create" onclick="showPage('create')"><span>＋</span>Create</button>
+ <button class="nav-item" data-page="settings" onclick="showPage('settings')"><span>⚙</span>Settings</button>
+</nav>
+
+<audio id="audio" loop></audio>
+
+<div id="ring">
+ <div style="width:100%;max-width:390px">
+  <div style="font-size:40px">♡ ✦ ♡</div>
+  <div style="letter-spacing:3px;font-size:11px;margin:12px">IT'S YOUR MOMENT</div>
+  <div id="ringTime" class="ring-time">07:00</div>
+  <h2 id="ringName" style="font-family:Outfit">Good Morning!</h2>
+  <img id="ringImage" class="ring-img" hidden>
+  <div style="font-size:12px;color:#fff0f7">Wake up and make today beautiful.</div>
+  <div class="ring-actions">
+   <button style="background:#ffffff;color:#b75b87" onclick="snooze()">SNOOZE</button>
+   <button style="background:#b95183;color:white" onclick="stopAlarm()">STOP</button>
+  </div>
+ </div>
+</div>
+
+<script>
+const KEY='blink_buddy_pink_v2';
+let alarms=[];
+let current=null;
+let previewURL=null;
+let ringing=false;
+const $=id=>document.getElementById(id);
+
+function showPage(page){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ $(page).classList.add('active');
+ document.querySelectorAll('.nav-item').forEach(n=>{
+  n.classList.toggle('active',n.dataset.page===page);
+ });
+ if(page==='alarms')render();
+ if(page==='home')updateHome();
+}
+
+function tick(){
+ const d=new Date();
+ $('clock').textContent=d.toLocaleTimeString('id-ID',{hour12:false});
+ $('date').textContent=d.toLocaleDateString('id-ID',{
+  weekday:'long',day:'numeric',month:'long',year:'numeric'
+ });
+}
+setInterval(tick,1000);tick();
+
+function load(){
+ try{alarms=JSON.parse(localStorage.getItem(KEY)||'[]')}
+ catch(e){alarms=[]}
+ render();updateHome();
+}
+function persist(){
+ try{localStorage.setItem(KEY,JSON.stringify(alarms))}
+ catch(e){alert('Penyimpanan penuh. Coba gunakan file gambar yang lebih kecil.')}
+}
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({
+ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ }[c]));
+}
+function render(){
+ $('alarmList').innerHTML=alarms.length?alarms.map(a=>`
+ <div class="alarm-card">
+  <div style="flex:1;min-width:0">
+   <div class="alarm-time">${escapeHTML(a.time)}</div>
+   <div class="alarm-name">${escapeHTML(a.name)}</div>
+   <div class="alarm-meta">${a.music?'♫ Music selected':'No music'} · ${a.image?'♡ Picture selected':'No picture'}</div>
+  </div>
+  <button class="toggle ${a.enabled?'on':''}" onclick="toggle('${a.id}')" aria-label="Toggle alarm"></button>
+  <button class="text-button" onclick="removeAlarm('${a.id}')">✕</button>
+ </div>`).join(''):'<div class="empty"><div>🌷</div>No alarms yet.<br>Create your first lovely reminder.</div>';
+ updateHome();
+}
+function updateHome(){
+ $('total').textContent=alarms.length;
+ $('active').textContent=alarms.filter(a=>a.enabled).length;
+ const a=alarms.filter(x=>x.enabled).sort((a,b)=>a.time.localeCompare(b.time))[0];
+ $('nextAlarm').innerHTML=a?`
+ <div class="next-card">
+  <div class="next-icon">⏰</div>
+  <div>
+   <div class="next-time">${escapeHTML(a.time)}</div>
+   <div class="next-info">${escapeHTML(a.name)}</div>
+  </div>
+  <div class="pill">UP NEXT</div>
+ </div>`:'<div class="empty">♡ No upcoming alarms</div>';
+}
+function toggle(id){
+ const a=alarms.find(x=>x.id===id);
+ if(a){a.enabled=!a.enabled;persist();render()}
+}
+function removeAlarm(id){
+ if(confirm('Delete this alarm?')){
+  alarms=alarms.filter(x=>x.id!==id);persist();render();
+ }
+}
+$('music').addEventListener('change',e=>{
+ $('musicName').textContent=e.target.files[0]?.name||'No music selected';
+});
+$('picture').addEventListener('change',e=>{
+ const f=e.target.files[0];if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{$('imagePreview').src=r.result;$('imagePreview').hidden=false};
+ r.readAsDataURL(f);
+});
+function previewMusic(){
+ const f=$('music').files[0];
+ if(!f)return alert('Please choose music first.');
+ const audio=$('audio');
+ if(previewURL)URL.revokeObjectURL(previewURL);
+ previewURL=URL.createObjectURL(f);
+ audio.src=previewURL;audio.play().catch(()=>alert('Audio could not play.'));
+}
+function fileData(f){
+ return new Promise((resolve,reject)=>{
+  const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f);
+ });
+}
+async function saveAlarm(){
+ const time=$('time').value;
+ if(!time)return alert('Choose alarm time.');
+ const mf=$('music').files[0],pf=$('picture').files[0];
+ if(mf&&mf.size>8*1024*1024)return alert('Music maximum 8 MB for this HTML version.');
+ if(pf&&pf.size>3*1024*1024)return alert('Picture maximum 3 MB for this HTML version.');
+ const music=mf?await fileData(mf):'';
+ const image=pf?await fileData(pf):'';
+ alarms.push({
+  id:Date.now().toString()+Math.random().toString(16).slice(2),
+  time,name:$('name').value.trim()||'My Alarm',
+  music,image,enabled:true,lastDate:''
+ });
+ persist();render();
+ $('name').value='';$('music').value='';$('picture').value='';
+ $('musicName').textContent='No music selected';
+ $('imagePreview').hidden=true;
+ showPage('alarms');
+}
+function ring(a){
+ if(ringing)return;
+ ringing=true;current=a;
+ $('ringTime').textContent=a.time;
+ $('ringName').textContent=a.name;
+ $('ringImage').hidden=!a.image;
+ if(a.image)$('ringImage').src=a.image;
+ $('ring').classList.add('show');
+ if(a.music){
+  $('audio').src=a.music;
+  $('audio').currentTime=0;
+  $('audio').play().catch(()=>alert('Browser memblokir audio otomatis. Gunakan tombol putar atau integrasi audio native Android.'));
+ }
+ if(navigator.vibrate)navigator.vibrate([500,300,500,300,700]);
+}
+function stopAlarm(){
+ $('audio').pause();
+ $('ring').classList.remove('show');
+ ringing=false;current=null;
+}
+function snooze(){
+ if(!current)return;
+ const old={...current};
+ stopAlarm();
+ const d=new Date(Date.now()+5*60000);
+ old.time=d.toTimeString().slice(0,5);
+ old.id=Date.now().toString();
+ old.lastDate='';
+ old.enabled=true;
+ alarms.push(old);persist();render();
+}
+function check(){
+ const d=new Date();
+ const time=d.toTimeString().slice(0,5);
+ const date=d.toDateString();
+ alarms.forEach(a=>{
+  if(a.enabled&&a.time===time&&a.lastDate!==date){
+   a.lastDate=date;persist();ring(a);
+  }
+ });
+}
+function askPermission(){
+ if('Notification'in window){
+  Notification.requestPermission().then(p=>alert('Notification: '+p));
+ }else alert('Notification API is not available.');
+}
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='visible')check();
+});
+setInterval(check,1000);
+load();
+</script>
+</body>
+</html>
